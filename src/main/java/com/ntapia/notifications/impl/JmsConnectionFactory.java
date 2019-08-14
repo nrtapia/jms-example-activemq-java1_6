@@ -1,4 +1,4 @@
-package com.ntapia.notifications;
+package com.ntapia.notifications.impl;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ public final class JmsConnectionFactory {
 
     private static final String BROKER_URL_REQUIRED = "Broker URL is required!";
     private static final String ERROR_CONNECT_TO = "Error to connect to: ";
+    private static final String ERROR_CONNECT_ACTIVE_MQ = "Error to connect with ActiveMQ";
 
     private static Connection INSTANCE;
 
@@ -26,8 +27,10 @@ public final class JmsConnectionFactory {
             try {
                 ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(userName, password, brokerUrl);
                 INSTANCE = connectionFactory.createConnection();
+                INSTANCE.start();
             } catch (JMSException e) {
                 LOGGER.error(ERROR_CONNECT_TO + brokerUrl, e);
+                throw new ConectionJmsException(ERROR_CONNECT_ACTIVE_MQ);
             }
         }
 
