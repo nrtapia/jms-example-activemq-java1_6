@@ -1,16 +1,18 @@
-package com.ntapia.notifications;
+package com.ntapia.notifications.impl;
 
 
+import com.ntapia.notifications.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
+import static com.ntapia.notifications.impl.Util.ERROR_CREATE_SESSION;
+
 public class PublisherJmsImpl implements Publisher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PublisherJmsImpl.class);
 
-    private static final String ERROR_CREATE_SESSION = "Error to create JMS session";
     private static final String ERROR_SEND_MESSAGE = "Error sending a message";
     private static final String MESSAGE_SENT_SUCCESS = "Message sent successfully to: {}";
     private static final String SEND_MESSAGE = "Send JMS to: {} message: {}";
@@ -23,27 +25,27 @@ public class PublisherJmsImpl implements Publisher {
             this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException e) {
             LOGGER.error(ERROR_CREATE_SESSION, e);
-            throw new PublisherException(ERROR_CREATE_SESSION);
+            throw new ConectionJmsException(ERROR_CREATE_SESSION);
         }
     }
 
 
     @Override
-    public void send(String target, String message) {
-        LOGGER.debug(SEND_MESSAGE, target, message);
+    public void send(String queueName, String message) {
+        LOGGER.debug(SEND_MESSAGE, queueName, message);
 
         Destination destination;
         MessageProducer messageProducer = null;
         try {
-            destination = session.createQueue(target);
+            destination = session.createQueue(queueName);
             messageProducer = session.createProducer(destination);
 
             TextMessage textMessage = session.createTextMessage(message);
             messageProducer.send(textMessage);
-            LOGGER.debug(MESSAGE_SENT_SUCCESS, target);
+            LOGGER.debug(MESSAGE_SENT_SUCCESS, queueName);
 
         } catch (JMSException e) {
-            LOGGER.error("Error to send destination: " + target + " " + e.getMessage(), e);
+            LOGGER.error("Error to send destination: " + queueName + " " + e.getMessage(), e);
             throw new PublisherException(ERROR_SEND_MESSAGE);
 
         } finally {

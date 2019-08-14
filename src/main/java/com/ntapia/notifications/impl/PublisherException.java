@@ -1,4 +1,4 @@
-package com.ntapia.notifications;
+package com.ntapia.notifications.impl;
 
 public class PublisherException extends RuntimeException {
 

@@ -1,5 +1,7 @@
 package com.ntapia.notifications;
 
+import com.ntapia.notifications.impl.JmsConnectionFactory;
+import com.ntapia.notifications.impl.PublisherJmsImpl;
 import org.junit.Test;
 
 import javax.jms.Connection;
