@@ -18,21 +18,25 @@ public class PublisherJmsImpl implements Publisher {
     private static final String SEND_MESSAGE = "Send JMS to: {} message: {}";
     private static final String ERROR_CLOSE_MESSAGE_PRODUCER = "Error to close message producer";
 
-    private final Session session;
+    private final Connection connection;
 
     public PublisherJmsImpl(Connection connection) {
-        try {
-            this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        } catch (JMSException e) {
-            LOGGER.error(ERROR_CREATE_SESSION, e);
-            throw new ConectionJmsException(ERROR_CREATE_SESSION);
-        }
+        this.connection = connection;
     }
 
 
     @Override
     public void send(String queueName, String message) {
         LOGGER.debug(SEND_MESSAGE, queueName, message);
+
+        final Session session;
+        try {
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        } catch (JMSException e) {
+            LOGGER.error(ERROR_CREATE_SESSION, e);
+            throw new ConectionJmsException(ERROR_CREATE_SESSION);
+        }
+
 
         Destination destination;
         MessageProducer messageProducer = null;
