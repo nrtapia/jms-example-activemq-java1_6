@@ -44,14 +44,6 @@
             <artifactId>activemq-all</artifactId>
             <version>${activemq.version}</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/commons-pool/commons-pool -->
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.5.1</version>
-        </dependency>
-
     </dependencies>
 
     <build>

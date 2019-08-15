@@ -1,7 +1,6 @@
 package com.ntapia.notifications.impl;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +15,6 @@ public final class JmsConnectionFactory {
     private static final String BROKER_URL_REQUIRED = "Broker URL is required!";
     private static final String ERROR_CONNECT_TO = "Error to connect to: ";
     private static final String ERROR_CONNECT_ACTIVE_MQ = "Error to connect with ActiveMQ";
-    private static final String ERROR_CLOSE_CONNECTION = "Error to close ActiveMQConnection";
-    private static final String CLOSE_CONNECTION = "Closing ActiveMQ connection.";
-    private static final int MAX_CONNECTIONS = 10;
 
     private static Connection INSTANCE;
 
@@ -30,8 +26,7 @@ public final class JmsConnectionFactory {
         if (INSTANCE == null) {
             try {
                 ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(userName, password, brokerUrl);
-                final PooledConnectionFactory pooledConnectionFactory = createPooledConnectionFactory(connectionFactory);
-                INSTANCE = pooledConnectionFactory.createConnection();
+                INSTANCE = connectionFactory.createConnection();
                 INSTANCE.start();
             } catch (JMSException e) {
                 LOGGER.error(ERROR_CONNECT_TO + brokerUrl, e);
@@ -40,23 +35,6 @@ public final class JmsConnectionFactory {
         }
 
         return INSTANCE;
-    }
-
-    private static PooledConnectionFactory createPooledConnectionFactory(ConnectionFactory connectionFactory) {
-        final PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
-        pooledConnectionFactory.setConnectionFactory(connectionFactory);
-        pooledConnectionFactory.setMaxConnections(MAX_CONNECTIONS);
-        return pooledConnectionFactory;
-    }
-
-    public synchronized static void closeConnection() {
-        try {
-            LOGGER.debug(CLOSE_CONNECTION);
-            INSTANCE.close();
-
-        } catch (JMSException e) {
-            LOGGER.error(ERROR_CLOSE_CONNECTION, e);
-        }
     }
 
 }
